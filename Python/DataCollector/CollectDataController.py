@@ -70,6 +70,9 @@ class PlottingManagement():
     def resetmetrics(self):
         self.metrics.framescollected.setText("0")
         self.metrics.totalchannels.setText(str(self.base.channelcount))
+        # Add these two lines:
+        self.collect_data_window.maxforce_button.setEnabled(True)
+        self.collect_data_window.maxforce_button.setStyleSheet("color : white")
 
     def threadManager(self, start_trigger, stop_trigger):
         """Handles the threads for the DataCollector gui"""

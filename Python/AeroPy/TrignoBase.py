@@ -16,8 +16,8 @@ clr.AddReference("System.Collections")
 
 from Aero import AeroPy
 
-key = ""
-license = ""
+key = "MIIBKjCB4wYHKoZIzj0CATCB1wIBATAsBgcqhkjOPQEBAiEA/////wAAAAEAAAAAAAAAAAAAAAD///////////////8wWwQg/////wAAAAEAAAAAAAAAAAAAAAD///////////////wEIFrGNdiqOpPns+u9VXaYhrxlHQawzFOw9jvOPD4n0mBLAxUAxJ02CIbnBJNqZnjhE50mt4GffpAEIQNrF9Hy4SxCR/i85uVjpEDydwN9gS3rM6D0oTlF2JjClgIhAP////8AAAAA//////////+85vqtpxeehPO5ysL8YyVRAgEBA0IABN8jEklk8tvUS6fclnYlwgxodZhAPpZP+i3C5GbLXE+sJ3uPAb0UBTheWeCky8Lf6iRDwjpfUPbYdn2RD5ifkhs="
+license = "<License>  <Id>cef8c32e-144f-4022-bac2-129a2d5d5c56</Id>  <Type>Standard</Type>  <Quantity>10</Quantity>  <LicenseAttributes>    <Attribute name='Software'></Attribute>  </LicenseAttributes>  <ProductFeatures>    <Feature name='Sales'>True</Feature>    <Feature name='Billing'>False</Feature>  </ProductFeatures>  <Customer>    <Name>Sciences and Methods for Engineering</Name>    <Email>227687@studenti.unimore.it</Email>  </Customer>  <Expiration>Thu, 19 Feb 2026 00:00:00 GMT</Expiration>  <Signature>MEQCIFC8ftgGmmQ948LjB+MmOnMAelEeq4ePG/H2Xx8cYuR+AiAhjOdQDY233Cd4nqakBMn2c3matFjsaGLHtNWmycqa8A==</Signature></License>"
 
 
 class TrignoBase():
@@ -198,9 +198,11 @@ class TrignoBase():
         else:
             return False
 
+    # In the Stop_Callback method, add this at the beginning:
     def Stop_Callback(self):
         """Callback to stop the data stream"""
-        self.collection_data_handler.pauseFlag = True
+        if hasattr(self, 'collection_data_handler'):  # Add this check
+            self.collection_data_handler.pauseFlag = True
         self.TrigBase.Stop()
         print("Data Collection Complete")
         self.csv_writer.data = self.collection_data_handler.DataHandler.allcollectiondata

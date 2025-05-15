@@ -15,7 +15,7 @@ from tkinter import filedialog
 
 from DataCollector.CollectionMetricsManagement import CollectionMetricsManagement
 from Plotter import GenericPlot as gp
-
+from DataCollector.MaxForceThread import MaxForceThread
 
 class CollectDataWindow(QWidget):
     plot_enabled = False
@@ -140,6 +140,16 @@ class CollectDataWindow(QWidget):
         self.exportcsv_button.setEnabled(False)
         self.exportcsv_button.setFixedHeight(50)
         buttonLayout.addWidget(self.exportcsv_button)
+
+        self.maxforce_button = QPushButton('Calculate Max Force', self)
+        self.maxforce_button.setToolTip('Capture max force for 5 seconds')
+        self.maxforce_button.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.maxforce_button.objectName = 'MaxForce'
+        self.maxforce_button.clicked.connect(self.maxforce_callback)
+        self.maxforce_button.setStyleSheet('QPushButton {color: grey;}')
+        self.maxforce_button.setEnabled(False)
+        self.maxforce_button.setFixedHeight(50)
+        buttonLayout.addWidget(self.maxforce_button)
 
         # ---- Drop-down menu of sensor modes
         self.SensorModeList = QComboBox(self)
@@ -408,3 +418,29 @@ class CollectDataWindow(QWidget):
                 self.set_sensor_list_box(sensorList)
                 self.SensorModeList.setCurrentText(selMode)
                 self.SensorListBox.setCurrentRow(curItem)
+
+    def maxforce_callback(self):
+        """Callback for max force calculation"""
+        if not self.CallbackConnector.pauseFlag:
+            QMessageBox.warning(self, "Warning", "Stop data collection first")
+            return
+        
+        progress = QProgressDialog("Calculating max force...", "Cancel", 0, 5, self)
+        progress.setWindowTitle("Max Force Calculation")
+        progress.setWindowModality(Qt.WindowModal)
+        progress.setAutoClose(True)
+        
+        self.maxforce_thread = MaxForceThread(self.CallbackConnector.base)
+        self.maxforce_thread.progress_updated.connect(progress.setValue)
+        self.maxforce_thread.calculation_complete.connect(self.show_maxforce_result)
+        self.maxforce_thread.start()
+        
+        progress.exec_()
+
+    def show_maxforce_result(self, max_values):
+        """Display the max force results"""
+        result_text = "Max Force Results:\n\n"
+        for i, value in enumerate(max_values):
+            result_text += f"Channel {i+1}: {value:.2f} mV\n"
+        
+        QMessageBox.information(self, "Max Force Results", result_text)

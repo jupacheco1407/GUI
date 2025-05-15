@@ -73,4 +73,3 @@ class StartWindow(QWidget):
                 self.error.setText(str(e))
             self.controller.startWindow.show()
             print(Exception)
-
