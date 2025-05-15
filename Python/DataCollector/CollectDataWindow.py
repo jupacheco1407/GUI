@@ -431,16 +431,12 @@ class CollectDataWindow(QWidget):
         progress.setAutoClose(True)
         
         self.maxforce_thread = MaxForceThread(self.CallbackConnector.base)
-        self.maxforce_thread.progress_updated.connect(progress.setValue)
-        self.maxforce_thread.calculation_complete.connect(self.show_maxforce_result)
+        self.maxforce_thread.progress_updated.connect(progress.setValue)  # Atualiza barra de progresso
+        self.maxforce_thread.calculation_complete.connect(self.show_maxforce_result)  # Exibe resultado
         self.maxforce_thread.start()
         
         progress.exec_()
 
-    def show_maxforce_result(self, max_values):
-        """Display the max force results"""
-        result_text = "Max Force Results:\n\n"
-        for i, value in enumerate(max_values):
-            result_text += f"Channel {i+1}: {value:.2f} mV\n"
-        
-        QMessageBox.information(self, "Max Force Results", result_text)
+    def show_maxforce_result(self, max_value):
+        result_text = f"Max Force Result:\n\n{max_value:.2f} mV"
+        QMessageBox.information(self, "Max Force Result", result_text)

@@ -1,7 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication
 from UIControls.LandingScreenController import *
-
 def main():
     app = QApplication(sys.argv)
     app.setStyleSheet('.QLabel { font-size: 12pt;}'

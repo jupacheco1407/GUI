@@ -1,49 +1,39 @@
 from PySide6.QtCore import QThread, Signal
-import time
 
 class MaxForceThread(QThread):
-    progress_updated = Signal(int)
-    calculation_complete = Signal(list)
-    
-    def __init__(self, trigno_base):
+    # Declaração dos sinais
+    progress_updated = Signal(int)  # Pode ser int, float, etc. Ajuste conforme seu progresso
+    calculation_complete = Signal(float)  # Valor final do cálculo, por exemplo
+
+    def __init__(self, base):
         super().__init__()
-        self.trigno_base = trigno_base
-        self.running = True
-        
+        self.base = base
+        self._is_running = True
+
     def run(self):
-        """Capture data for 5 seconds and find max values"""
-        max_values = [0] * len(self.trigno_base.channel_guids)
-        start_time = time.time()
-        
-        # Temporary data handler
-        def data_handler(data):
-            nonlocal max_values
-            for i, channel_data in enumerate(data):
-                current_max = max(channel_data) if channel_data else 0
-                if current_max > max_values[i]:
-                    max_values[i] = current_max
-        
-        # Register temporary callback
-        original_callback = self.trigno_base.collection_data_handler.DataHandler.processData
-        self.trigno_base.collection_data_handler.DataHandler.processData = data_handler
-        
-        # Start collection
-        self.trigno_base.Start_Callback(False, False)
-        
-        # Update progress for 5 seconds
-        for second in range(1, 6):
-            time.sleep(1)
-            self.progress_updated.emit(second)
-            if not self.running:
+        max_force = 0.0
+        # Exemplo de loop de cálculo de força máxima
+        for i in range(100):
+            if not self._is_running:
                 break
-        
-        # Stop collection and restore original callback
-        self.trigno_base.Stop_Callback()
-        self.trigno_base.collection_data_handler.DataHandler.processData = original_callback
-        
-        # Emit results
-        self.calculation_complete.emit(max_values)
-    
+            # Simula cálculo ou leitura de dados
+            # (substitua isso pela lógica real da sua aplicação)
+            max_force = max(max_force, self.get_current_force())
+
+            # Emite progresso como porcentagem (0 a 100)
+            self.progress_updated.emit(i + 1)
+
+            # Pequena pausa simulada (para não travar a thread)
+            self.msleep(50)
+
+        # Quando cálculo terminar, emite o resultado final
+        self.calculation_complete.emit(max_force)
+
+    def get_current_force(self):
+        # Implementar a leitura/ cálculo real da força máxima
+        # Aqui só um dummy para exemplo
+        import random
+        return random.uniform(0, 100)
+
     def stop(self):
-        """Stop the calculation early"""
-        self.running = False
+        self._is_running = False

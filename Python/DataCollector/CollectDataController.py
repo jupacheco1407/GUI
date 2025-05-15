@@ -8,6 +8,7 @@ from collections import deque
 from Plotter.GenericPlot import *
 from AeroPy.TrignoBase import *
 from AeroPy.DataManager import *
+from DataCollector.MaxForceThread import MaxForceThread
 
 clr.AddReference("System.Collections")
 
@@ -16,6 +17,7 @@ app.use_app('PySide6')
 
 class PlottingManagement():
     def __init__(self, collect_data_window, metrics, emgplot=None):
+        self.max_force_thread = None
         self.base = TrignoBase(self)
         self.collect_data_window = collect_data_window
         self.EMGplot = emgplot
@@ -77,7 +79,8 @@ class PlottingManagement():
     def threadManager(self, start_trigger, stop_trigger):
         """Handles the threads for the DataCollector gui"""
         self.emg_plot = deque()
-
+        self.max_force_thread = MaxForceThread(self.emg_plot)
+        self.max_force_thread.start()
         # Start standard data stream (only channel data, no time values)
         if not self.streamYTData:
             self.t1 = threading.Thread(target=self.streaming)
